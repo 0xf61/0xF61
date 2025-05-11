@@ -6,12 +6,12 @@ Hi there 👋,<br/>I'm Emir!
 
 ## Little bit about me
 
-💻 &nbsp;Working [@Insider](https://github.com/useinsider) <br/>
+💻 &nbsp;Working on Personal Projects <br/>
 🌱 &nbsp;I'm on track with learning more about H4ck1ng, DevSecOps and Software Architecture. <br/>
 😎 &nbsp;You can read my blog here ⤵️
 
-[![Field Notes](https://img.shields.io/badge/de2.in-black?style=flat-circle&label=Field+Notes&labelColor=black&color=%23ff6611)](https://de2.in/)
-[![Blog](https://img.shields.io/badge/kurt.link-black?style=flat-circle&label=Blog&labelColor=black&color=%23ff6611)](https://kurt.link/)
+[![Field Notes](https://img.shields.io/badge/kurt.link-black?style=flat-circle&label=Field+Notes&labelColor=black&color=%23ff6611)](https://kurt.link/)
+[![Old Blog](https://img.shields.io/badge/blog.kurt.link-black?style=flat-circle&label=Blog&labelColor=black&color=%23ff6611)](https://blog.kurt.link/)
 
 ## 🌐 Socials:
 
