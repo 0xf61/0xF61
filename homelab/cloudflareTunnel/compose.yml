@@ -1,0 +1,19 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    networks:
+      - cf_net
+    container_name: cloudflareTunnel
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TRANSPORT_PROTOCOL=auto
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+
+networks:
+  cf_net:
+    name: cf_net
+    driver: bridge

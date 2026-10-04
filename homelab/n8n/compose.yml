@@ -1,0 +1,26 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: unless-stopped
+    networks:
+      - cf_net
+      - caddy_net
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES=false
+      - N8N_RESTRICT_FILE_ACCESS_TO=/files
+      - N8N_HOST=n8n.${DOMAIN}
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.${DOMAIN}/
+      - GENERIC_TIMEZONE=UTC
+      - TZ=UTC
+    volumes:
+      - $BASEPATH/n8n/data:/home/node/.n8n
+      - $BASEPATH/n8n/data/files:/files
+
+networks:
+  cf_net:
+    external: true
+  caddy_net:
+    external: true

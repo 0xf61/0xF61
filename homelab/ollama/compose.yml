@@ -1,0 +1,21 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    networks:
+      - caddy_net
+    environment:
+      - TZ=UTC
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_CONTEXT_LENGTH=65536
+      - OLLAMA_FLASH_ATTENTION=1
+      - OLLAMA_KV_CACHE_TYPE=q8_0
+    volumes:
+      - $BASEPATH/ollama/data:/root/.ollama
+    post_start:
+      - command: |
+          sh -c "ollama run gemma4:e2b Reply with OK >/dev/null 2>&1 || true"
+networks:
+  caddy_net:
+    external: true

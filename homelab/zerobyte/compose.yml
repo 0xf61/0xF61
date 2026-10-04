@@ -1,0 +1,29 @@
+services:
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:v0.43.2
+    container_name: zerobyte
+    restart: unless-stopped
+    networks:
+      - caddy_net
+      - cf_net
+    cap_add:
+      - SYS_ADMIN
+    # ports:
+    #   - "4096:4096"
+    devices:
+      - /dev/fuse:/dev/fuse
+    environment:
+      - TZ=UTC
+      - BASE_URL=https://zero.${DOMAIN} # URL you will use to access Zerobyte
+      - APP_SECRET=${APP_SECRET} # Generate your own secret with `openssl rand -hex 32`
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/lib/zerobyte:/var/lib/zerobyte
+      - /home/pi/.config/rclone:/root/.config/rclone:ro
+      - $BASEPATH:$BASEPATH:ro
+
+networks:
+  caddy_net:
+    external: true
+  cf_net:
+    external: true

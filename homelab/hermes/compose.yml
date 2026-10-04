@@ -1,0 +1,27 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    command: gateway run
+    networks:
+      - caddy_net
+      - cf_net
+    environment:
+      - TZ=UTC
+      - GLM_API_KEY=${GLM_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${HERMES_TELEGRAM_TOKEN}
+      - TELEGRAM_ALLOWED_USERS=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_HOME_CHANNEL=${TELEGRAM_CHAT_ID}
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASH_USER}
+      - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASH_PASS}
+      - HERMES_DASHBOARD_BASIC_AUTH_SECRET=${HERMES_DASH_SECRET}
+    volumes:
+      - $BASEPATH/hermes/data:/opt/data
+
+networks:
+  caddy_net:
+    external: true
+  cf_net:
+    external: true

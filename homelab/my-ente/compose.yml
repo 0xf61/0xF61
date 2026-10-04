@@ -1,0 +1,109 @@
+services:
+  museum:
+    image: ghcr.io/ente/server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./museum.yaml:/museum.yaml:ro
+      - ./data:/data:ro
+    networks:
+      - default
+      - caddy_net
+      - cf_net
+    environment:
+      - ENTE_KEY_ENCRYPTION=${ENTE_KEY_ENCRYPTION}
+      - ENTE_KEY_HASH=${ENTE_KEY_HASH}
+      - ENTE_JWT_SECRET=${ENTE_JWT_SECRET}
+      - ENTE_DB_PASSWORD=${ENTE_DB_PASSWORD}
+      - ENTE_S3_B2_EU_CEN_ENDPOINT=https://minio.${DOMAIN}
+      - ENTE_S3_B2_EU_CEN_KEY=${ENTE_S3_B2_EU_CEN_KEY}
+      - ENTE_S3_B2_EU_CEN_SECRET=${ENTE_S3_B2_EU_CEN_SECRET}
+      - ENTE_APPS_PUBLIC_ALBUMS=https://album.${DOMAIN}
+      - ENTE_APPS_PUBLIC_LOCKER=https://file.${DOMAIN}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/ping"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  web:
+    image: ghcr.io/ente/web
+    restart: unless-stopped
+    networks:
+      - default
+      - caddy_net
+      - cf_net
+    environment:
+      ENTE_API_ORIGIN: https://entapi.${DOMAIN}
+      ENTE_ALBUMS_ORIGIN: https://album.${DOMAIN}
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=$PG_USER
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=ente_db
+    healthcheck:
+      test: pg_isready -q -d ente_db -U pguser
+      start_period: 40s
+      start_interval: 1s
+    volumes:
+      - postgres-data-hdd:/var/lib/postgresql/data
+
+  minio:
+    # pgsty/silo = maintained MinIO community fork; ente's official replacement
+    # for the removed minio/minio image (ente PR #13074). Drop-in: same data
+    # format, same env vars, same mc CLI, reads the existing MinIO volume.
+    image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
+    restart: unless-stopped
+    ports:
+      #- 3200:3200 # MinIO API
+      - 3201:3201 # Web UI
+    networks:
+      - default
+      - caddy_net
+      - cf_net
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASS}
+      MINIO_SERVER_URL: https://minio.${DOMAIN}
+      MINIO_BROWSER: "on"
+      MINIO_BROWSER_ASSETS_PATH: "/minio"
+      MINIO_LOG_QUERY: on
+    command: server /data --address ":3200" --console-address ":3201"
+    volumes:
+      - minio-data-hdd:/data
+    post_start:
+      - command: |
+          sh -c "
+          until mc alias set h0 http://localhost:3200 \"$$MINIO_ROOT_USER\" \"$$MINIO_ROOT_PASSWORD\" 2>/dev/null; do
+            echo 'Waiting for MinIO...'
+            sleep 0.5
+          done
+
+          mc mb --ignore-existing h0/b2-eu-cen
+          "
+
+volumes:
+  postgres-data-hdd:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $BASEPATH/my-ente/data/postgres
+  minio-data-hdd:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $BASEPATH/my-ente/data/minio
+
+networks:
+  caddy_net:
+    external: true
+  cf_net:
+    external: true

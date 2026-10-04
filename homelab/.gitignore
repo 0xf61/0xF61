@@ -1,0 +1,15 @@
+# runtime/state — never commit
+data/
+*/data/
+my-ente/my-data/
+# secrets & binaries
+my-ente/.secret.txt
+my-ente/ente
+# backups of edits
+*.bak-*
+
+# backup archives & unreadable runtime
+.backups/
+my-ente/garage.toml
+
+

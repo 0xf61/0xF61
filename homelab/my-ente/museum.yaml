@@ -1,0 +1,23 @@
+db:
+  host: postgres
+  port: 5432
+  name: ente_db
+  user: pguser
+
+s3:
+  are_local_buckets: false
+  use_path_style_urls: true
+  region: eu-central-2
+  hot_storage:
+    primary: b2-eu-cen
+  b2-eu-cen:
+    region: eu-central-2
+    bucket: b2-eu-cen
+    force_path_style: true
+
+internal:
+  disable-registration: true
+  admin: 1580559962386438
+
+replication.enabled: false
+jobs.clear-orphan-objects.enabled: true

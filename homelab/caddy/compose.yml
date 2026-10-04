@@ -1,0 +1,26 @@
+services:
+  caddy:
+    image: caddybuilds/caddy-cloudflare:alpine
+    container_name: caddy
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./data/tls:/data
+      - ./data/config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data/site:/srv
+    networks:
+      - caddy_net
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - DOMAIN=${DOMAIN}
+
+networks:
+  caddy_net:
+    name: caddy_net
+    driver: bridge

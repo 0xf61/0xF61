@@ -1,0 +1,54 @@
+{
+	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+# For Museum
+entapi.{$DOMAIN} {
+	reverse_proxy museum:8080
+}
+
+# For Ente Photos web app
+ente.{$DOMAIN} {
+	reverse_proxy web:3000
+}
+
+# For n8n
+n8n.{$DOMAIN} {
+	reverse_proxy n8n:5678
+}
+
+# For zerobyte
+zero.{$DOMAIN} {
+	reverse_proxy zerobyte:4096
+}
+
+minio.{$DOMAIN} {
+	reverse_proxy minio:3200 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		flush_interval -1
+		transport http {
+			response_header_timeout 300s
+			dial_timeout 30s
+		}
+	}
+}
+
+:80 {
+	reverse_proxy arcane:3552
+}
+
+arc.{$DOMAIN} {
+	reverse_proxy arcane:3552
+}
+
+# For hermes agent dashboard
+hermes.{$DOMAIN} {
+	reverse_proxy hermes:9119
+}
+
+# For Ente Locker (public file sharing)
+file.{$DOMAIN} {
+	reverse_proxy web:3005
+}

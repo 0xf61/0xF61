@@ -1,0 +1,15 @@
+services:
+  silverbullet:
+    image: ghcr.io/silverbulletmd/silverbullet
+    container_name: silverbullet
+    restart: unless-stopped
+    networks:
+      - cf_net
+    environment:
+      - SB_FOLDER=/space
+    volumes:
+      - $BASEPATH/silverbullet/data:/space
+
+networks:
+  cf_net:
+    external: true
